@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>基础-下载文件</title>
+  <style type="text/css">
+    #location-img,
+    #location-zip,
+    #iframe {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #666666;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <h2>location.href & iframe 下载</h2>
+    <div>
+      <div>
+        <button id="location-img">location.href下载图片</button>
+      </div>
+      <div>
+        <button id="location-zip">location.href下载zip</button>
+      </div>
+      <div>
+        <button id="iframe">
+          iframe下载
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  function handleLocationImg() {
+    location.href = '../downloads/cutegirl.jpg'
+  }
+  document.getElementById('location-img').addEventListener('click', handleLocationImg)
+
+  function handleLocationZip() {
+    location.href = '../downloads/package.zip'
+  }
+  document.getElementById('location-zip').addEventListener('click', handleLocationZip)
+
+  function handleDownIframe() {
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    iframe.src = '../downloads/helpFile.docx'
+    document.body.appendChild(iframe)
+  }
+  document.getElementById('iframe').addEventListener('click', handleDownIframe)
+</script>

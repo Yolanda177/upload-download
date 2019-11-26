@@ -1,34 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>粘贴上传文件</title>
     <style type="text/css">
-    .editor-box{
-        height:200px;
-        width: 500px;
-        border:solid 1px #000;
-        margin-bottom: 30px;
-    }
-    .over{
-        background-color: green;
-    }
+        .editor-box {
+            height: 200px;
+            width: 500px;
+            border: solid 1px #000;
+            margin-bottom: 30px;
+        }
+
+        .over {
+            background-color: green;
+        }
     </style>
 </head>
+
 <body>
-    <h1>多文件上传  之 粘贴上传  xhr formdata</h1>
-    <div class="editor-box" id="editor-box" contenteditable="true" >
-       可以直接粘贴图片到这里直接上传
+    <h1>多文件上传 之 粘贴上传 xhr formdata</h1>
+    <div class="editor-box" id="editor-box" contenteditable="true">
+        可以直接粘贴图片到这里直接上传
     </div>
 </body>
+
 </html>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
     var box = document.getElementById('editor-box');
 
-    box.addEventListener('paste',function (event) {
+    box.addEventListener('paste', function (event) {
         var data = (event.clipboardData || window.clipboardData);
         console.dir(data);
 
@@ -48,47 +53,58 @@
         event.preventDefault();
 
         submitUpload();
-    }); 
+    });
 
     function submitUpload() {
 
-        var fileList = window.willUploadFileList||[];
+        var fileList = window.willUploadFileList || [];
 
-        if(!fileList.length){
+        if (!fileList.length) {
             alert('请选择文件');
             return;
         }
 
         var fd = new FormData();   //构造FormData对象
 
-        for(var i =0;i<fileList.length;i++){
+        for (var i = 0; i < fileList.length; i++) {
             fd.append('f1', fileList[i]);//支持多文件上传
         }
-
-        var xhr = new XMLHttpRequest();   //创建对象
-        xhr.open('POST', 'http://localhost:8100/', true);
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                var obj = JSON.parse(xhr.responseText);   //返回值
-                console.log(obj);
-                if(obj.fileUrl.length){
-                    var img = document.createElement('img');
-                    img.src= obj.fileUrl[0];
-                    img.style.width='100px';
-                    insertNodeToEditor(box,img);
-                   // alert('上传成功');
+        // console.log(fileList)
+        axios.post('http://localhost:8100/upfile', fd).then((res) => {
+            if (res.status === 200) {
+                console.log(res)
+                if (res.data.fileUrl.length) {
+                    const img = document.createElement('img')
+                    img.src = res.data.fileUrl[0]
+                    img.style.width = '100px'
+                    insertNodeToEditor(box, img)
+                    console.log('上传成功')
                 }
             }
-        }
+        })
+        // var xhr = new XMLHttpRequest();   //创建对象
+        // xhr.open('POST', 'http://localhost:8100/', true);
 
-        //注意 send 一定要写在最下面，否则 onprogress 只会执行最后一次 也就是100%的时候
-        xhr.send(fd);//发送时  Content-Type默认就是: multipart/form-data; 
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState === 4) {
+        //         var obj = JSON.parse(xhr.responseText);   //返回值
+        //         console.log(obj);
+        //         if (obj.fileUrl.length) {
+        //             var img = document.createElement('img');
+        //             img.src = obj.fileUrl[0];
+        //             img.style.width = '100px';
+        //             insertNodeToEditor(box, img);
+        //             // alert('上传成功');
+        //         }
+        //     }
+        // }
+        // //注意 send 一定要写在最下面，否则 onprogress 只会执行最后一次 也就是100%的时候
+        // xhr.send(fd);//发送时  Content-Type默认就是: multipart/form-data; 
     }
 
 
     //光标处插入 dom 节点
-    function  insertNodeToEditor(editor,ele) {
+    function insertNodeToEditor(editor, ele) {
         //插入dom 节点
         var range;//记录光标位置对象
         var node = window.getSelection().anchorNode;

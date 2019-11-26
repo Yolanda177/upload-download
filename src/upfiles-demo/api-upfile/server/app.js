@@ -30,7 +30,9 @@ app.use(koaStatic(
 
 //二次处理文件，修改名称
 app.use((ctx) => {
+    // 检测接口地址为 /upfile
     if (ctx.path === '/upfile') {
+        console.log(ctx.request.files);
         var file = ctx.request.files ? ctx.request.files.f1 : null; //得到文件对象
         if (file) {
 
@@ -45,7 +47,7 @@ app.use((ctx) => {
                 //重命名文件
                 fs.renameSync(path, nextPath);
             }
-            //以 json 形式输出上传文件地址
+            //以 json 形式输出上传文件的存储地址
             ctx.body = getRenderData({
                 data: `${uploadHost}${nextPath.slice(nextPath.lastIndexOf('/') + 1)}`
             });

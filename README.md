@@ -9,7 +9,22 @@ $ npm  install
 如
 
 ```
-$ node ./src/cors-demo/demo1/server/app.js
+node ./src/cors-demo/demo1/server/app.js
+node ./src/upfiles-demo/demo1/server/app.js
+node ./src/upfiles-demo/demo2/server/app.js
+node ./src/upfiles-demo/demo3/server/app.js
+node ./src/upfiles-demo/demo4/server/app.js
+node ./src/upfiles-demo/demo5/server/app.js
+node ./src/upfiles-demo/demo6/server/app.js
+node ./src/upfiles-demo/demo7/server/app.js
+node ./src/upfiles-demo/demo8/server/app.js
+node ./src/upfiles-demo/demo9/server/app.js
+node ./src/upfiles-demo/demo10/server/app.js
+node ./src/upfiles-demo/demo11/server/app.js
+node ./src/upfiles-demo/demo12/server/app.js
+node ./src/upfiles-demo/demo13/server/app.js
+
+node ./src/download-demo/demo1/server/app.js
 ```
 
 ### PS

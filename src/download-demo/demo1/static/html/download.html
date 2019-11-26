@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>基础-下载文件</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+  <style type="text/css">
+    .online-type,
+    .auto-down-type,
+    .js-down {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #666666;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h2>基于 a 标签进行下载</h2>
+    <p>一般情况下，进行下载的文件格式有 图片image、文本文档txt、excel、pdf、docx、zip等等，实现方式是：
+      <p>{{alink}}</p>
+      <p>为什么要设置dowload 属性？请看下面（浏览器只能下载不能被浏览器打开的文件类型，而图片、
+        文本文件、html文件这种可以被打开的文件，是不会提示下载，直接在浏览器进行预览）</p>
+    </p>
+    <div>
+      <div class="online-type">
+        <div>浏览器支持在线打开的文件：(不涉及跨域情况下可设置a标签的download属性，即可解决在线打开问题，提示下载)
+          <button @click="handleSetDownload">{{buttonText}}</button>
+        </div>
+        <div>
+          <a href="../downloads/cutegirl.jpg" v-if="!setDownloadAtt">&lt;a
+            href="../downloads/cutegirl.jpg"&gt;&lt;/a&gt;(直接打开)</a>
+          <a href="../downloads/cutegirl.jpg" download v-else>&lt;a
+            href="../downloads/cutegirl.jpg" download &gt;&lt;/a&gt;(提示下载)</a>
+        </div>
+        <div>
+          <a href="../downloads/test.txt" v-if="!setDownloadAtt">&lt;a
+            href="../downloads/test.txt"&gt;&lt;/a&gt;(直接打开)</a>
+          <a href="../downloads/test.txt" download v-else>&lt;a
+            href="../downloads/test.txt" download &gt;&lt;/a&gt;(提示下载)</a>
+        </div>
+        <div>
+          <a href="../downloads/JavaScript.pdf" v-if="!setDownloadAtt">&lt;a
+            href="../downloads/JavaScript.pdf"&gt;&lt;/a&gt;(直接打开)</a>
+          <a href="../downloads/JavaScript.pdf" download v-else>&lt;a
+            href="../downloads/JavaScript.pdf" download &gt;&lt;/a&gt;(提示下载)</a>
+        </div>
+      </div>
+      <div class="auto-down-type">
+        <div><a href="../downloads/helpFile.docx">download-DOCX(提示下载)</a></div>
+        <div><a href="../downloads/newXlSX.xlsx">download-XLSX(提示下载)</a></div>
+        <div><a href="../downloads/package.zip">download-ZIP(提示下载)</a></div>
+      </div>
+      <div class="js-down">
+        (涉及跨域情况利用js修改在线预览为提示下载的几种方式：)
+        <div id="downloadDataUrl" @click="downloadImage">利用data:URL下载图片(提示下载)</div>
+        <div @click="axiosDownImage">axios下载Image</div>
+        <div @click="axiosDownPdf">axios下载PDF</div>
+        <div @click="downloadTxt">下载Txt</div>
+        <div @click="downloadPDF">下载pdf</div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      message: 'Hello Vue.js!',
+      setDownloadAtt: false,
+      buttonText: '设置download',
+      alink: '<a href="xxx/xxx" download>点击即可下载</a>'
+    },
+    methods: {
+      handleSetDownload() {
+        this.setDownloadAtt = !this.setDownloadAtt
+        if (this.setDownloadAtt) {
+          this.buttonText = '去掉download'
+        } else {
+          this.buttonText = '设置download'
+        }
+      },
+      downloadImage() {
+        const image = new Image()
+        // CORS 策略，会存在跨域问题https://stackoverflow.com/questions/20424279/canvas-todataurl-securityerror
+        image.setAttribute("crossOrigin", 'Anonymous')
+        image.src = `../downloads/cutegirl.jpg?${new Date().getTime()}`
+
+        // 将图片url转换成 base64
+        // 原理： 利用canvas.toDataURL的API转化成base64
+        const imageUrlToBase64 = (img) => {
+          const canvas = document.createElement("canvas")
+          canvas.width = img.width
+          canvas.height = img.height
+          const ctx = canvas.getContext("2d")
+          ctx.drawImage(img, 0, 0, img.width, img.height)
+          const mime = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase()
+          const dataUrl = canvas.toDataURL("image/" + mime)
+          return dataUrl
+        }
+
+        // 将 base64 转换成 blob
+        const base64ToBlob = (dataUrl) => {
+          console.log(dataUrl)
+          const arr = dataUrl.split(',')
+          debugger
+          const mime = arr[0].match(/:(.*?);/)[1]
+          const bStr = atob(arr[1])
+          let n = bStr.length
+          const unit8Array = new Uint8Array(n)
+          while (n--) {
+            unit8Array[n] = bStr.charCodeAt(n)
+          }
+          return new Blob([unit8Array], { type: mime })
+        }
+        // 将 blob 转换成 base64
+        const blobToBase64 = (blob) => {
+          // 对于 File 或 Blob 对象，可直接用 FileReader.readAsDataURL()方式获取data:URLs,也就是 base64
+          // api支持 file、 blob两种对象
+          return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = (e) => {
+              resolve(e.target.result)
+            };
+            // readAsDataURL
+            fileReader.readAsDataURL(blob)
+            fileReader.onerror = () => {
+              reject(new Error('文件流异常'))
+            }
+          })
+        }
+
+        image.onload = async function () {
+          const imageDataUrl = imageUrlToBase64(image)
+          const downloadDataUrlDom = document.createElement('a')
+          // downloadDataUrlDom.setAttribute('href', imageDataUrl)
+          // // 第二种方式 在第一种方式基础上
+          const imageBlobData = base64ToBlob(imageDataUrl)
+          console.log(imageBlobData);
+          debugger
+          // const base64Data = await blobToBase64(imageBlobData)
+          // 生成 blob:URLs 
+          // blob: URLs是URL.createObjectURL() 静态方法创建的一个 DOMString，其中包含一个表示参数中给出的对象的URL
+          // URL.createObjectURL()方法只能处理File或Blob对象，所以如果要生成blobURLs则必须将数据转换为blob对象或file对象
+          // 如果数据不是File或Blob对象
+          // const blob = new Blob([data][, MIMEType])
+          downloadDataUrlDom.setAttribute('href', URL.createObjectURL(imageBlobData))
+          downloadDataUrlDom.setAttribute('download', 'cutegirl')
+          downloadDataUrlDom.click()
+          debugger
+          URL.revokeObjectURL(imageBlobData)
+        }
+      },
+      downloadTxt() {
+        const alink = document.createElement('a')
+        axios.post('http://localhost:8100/downloads/test.txt').then(res => {
+          console.log(res);
+          const blob = new Blob([res.data])
+          alink.setAttribute('href', URL.createObjectURL(blob))
+          alink.setAttribute('download', '')
+          alink.click()
+          URL.revokeObjectURL(res.data)
+        })
+      },
+
+      downloadPDF() {
+        // 将 base64 转换成 blob
+        // 后端能直接处理成 blob 就能省略这些了
+        const base64ToBlob = (dataUrl) => {
+          console.log(dataUrl)
+          const arr = dataUrl.split(',')
+          debugger
+          const mime = arr[0].match(/:(.*?);/)[1]
+          const bStr = atob(arr[1])
+          let n = bStr.length
+          const unit8Array = new Uint8Array(n)
+          while (n--) {
+            unit8Array[n] = bStr.charCodeAt(n)
+          }
+          return new Blob([unit8Array], { type: mime })
+        }
+        const alink = document.createElement('a')
+        axios.post('http://localhost:8100/downloads/JavaScript.pdf', {
+          headers: { 'Content-Type': 'application/pdf' }
+        }).then(res => {
+          console.log(res);
+          const dataUrl = `data:application/pdf;base64,${res.data}`
+          console.log(dataUrl);
+          const blob = base64ToBlob(dataUrl)
+          // const blob = new Blob([res.data])
+          alink.setAttribute('href', URL.createObjectURL(blob))
+          alink.setAttribute('download', 'JavaScript')
+          alink.click()
+          URL.revokeObjectURL(res.data)
+        })
+      },
+
+      // 通过axios请求获取图片
+      axiosDownImage() {
+        axios.get('http://58.246.138.178:8790/dme/api/models/v2/img/96fa2eed8bd143efa233aca983db45dd', {
+          'responseType': 'blob'
+        }).then(res => {
+          console.log(res);
+          // 获取正确的图片格式 有时候jpeg图片下载会变成 jfif
+          const typeArr = res.headers['content-type'].split('/')
+          const alink = document.createElement('a')
+          alink.setAttribute('href', URL.createObjectURL(res.data))
+          debugger
+          alink.setAttribute('download', `cutegirl.${typeArr[1]}`)
+          alink.click()
+          URL.revokeObjectURL(res.data)
+        })
+      },
+      axiosDownPdf() {
+        axios.get('http://58.246.138.178:8790/dme/api/algorithms/v1/reference/0a36d4175054457e81f84a4fc09befc2', {
+          'responseType': 'blob'
+        }).then((res) => {
+          const { headers, data } = res
+          const fileReader = new FileReader()
+          console.log(res)
+          console.log(window.URL.createObjectURL(data))
+          const alink = document.createElement('a')
+          alink.href = window.URL.createObjectURL(res.data)
+          // 若设置了Content-Disposition 则文件名可从header读取
+          alink.setAttribute('download', 'test')
+          alink.click()
+          window.URL.revokeObjectURL(alink.href)
+        })
+      }
+    }
+  })
+</script>

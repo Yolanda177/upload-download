@@ -28,13 +28,14 @@ app.use(koaStatic(
 
 //二次处理文件，修改名称
 app.use((ctx) => {
-    console.log(ctx.request.files);
+    // console.log(ctx.request.files);
     var files = ctx.request.files.f1;//得到上传文件的数组
     var result=[];
     if(!Array.isArray(files)){
         files=[files];
     }
     files && files.forEach(item=>{
+        console.log(item)
         var path = item.path.replace(/\\/g, '/');
         var fname = item.name;//原文件名称
         var nextPath = path + fname;
@@ -57,7 +58,26 @@ app.use((ctx) => {
 })
 
 
+//跨域处理
+app.use((ctx) => {
 
+    //指定一个接口和返回数据
+    var path =ctx.path;
+    debugger
+    if (path ==='/favicon.ico'){
+
+        console.log('receive req');
+
+        //服务端通过 ctx.headers.origin 获取请求中的origin
+        //ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
+
+        ctx.body=JSON.stringify({
+            code:0,
+            msg:'success',
+            data:[]
+        });
+    }
+})
 
 /**
  * Create HTTP server.

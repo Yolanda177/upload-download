@@ -7,20 +7,41 @@
     <title>基础-上传文件</title>
 </head>
 <body>
-    <h1>最原始的上传文件操作 - 单文件上传</h1>
-    <h2>使用 form 表单直接请求,不用 js,页面会刷新</h2>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//oss.maxcdn.com/jquery.form/3.50/jquery.form.min.js"></script>
+    <script>
+        $(function () {
+            $(".but2").click(function () {
+            $('#form2').ajaxSubmit({
+                success: function (responseText) {
+                alert('上传成果！')
+                console.log(responseText)
+                    }
+                })
+            })
+        })
+    </script>
+    <h1>最原始的上传文件操作 & 利用 form 表单上传(单文件上传）</h1>
+    <!-- <h2>利用 form 表单上传</h2> -->
+    <div>
+        attention:
+        <li>form的enctype属性必须设为multipart/form-data(传输文件),且方法必须为post</li>
+        <li>input 必须设置 name 属性，否则数据无法发送</li>
+        <li>直接请求,不用 js,页面会刷新</li>
+    </div><br/>
+        <!-- action 提交表单时向何处发送表单数据, 提交后跳转到对应的地址，如果不想跳转有两种方法-->
+        <!-- 一种是添加 iframe 标签，并设置name属性，在form标签上加上 target标签，值为对应的iframe标签的name 值 -->
+        <!-- 第二种是利用 jquery 的 ajaxSubmit-->
+        <form id="form2" method="post" action="http://localhost:8100/upfile" enctype="multipart/form-data">
 
-   
-        <form method="post" action="http://localhost:8100/upfile" enctype="multipart/form-data">
-
-        <label for="f1">Choose file to upload</label>
-            <input type="file" id="f1" name="f1" style="display:none;"/><br/> input 必须设置 name 属性，否则数据无法发送<br/>
-<br/>
-            标题：<input type="text" name="title"/><br/><br/><br/>
-
+        <label for="f1">Choose file to upload</label><br/><br/>
+        <input type="file" id="f1" name="f1"/><br/><br/>
+        <!-- 标题：<input type="text" name="title"/><br/><br/><br/> -->
         <button type="submit" id="btn-0">上 传</button>
+        <button type="button" class="but2">上传2</button>
 
         </form>
+        <!-- <iframe name="targetIfr" style="display:none"></iframe>  -->
 
 </body>
 </html>

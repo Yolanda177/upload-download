@@ -30,12 +30,14 @@ var iframe = document.getElementById('temp-iframe');
 iframe.addEventListener('load',function () {
       var result = iframe.contentWindow.document.body.innerText;
       //得到结果，做后续处理，如图片预览
-      var obj = JSON.parse(result);
-      if(obj && obj.fileUrl.length){
+      if (result) {
+        var obj = JSON.parse(result);
+        if(obj && obj.fileUrl.length){
           alert('上传成功');
           
-      }
+        }
       console.log(obj);
+      }
 });
 
 
