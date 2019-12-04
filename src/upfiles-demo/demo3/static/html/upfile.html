@@ -1,44 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>基础-上传文件</title>
+    <style type="text/css">
+        .upload-box {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #666666;
+        }
+
+        .drop-box {
+            height: 200px;
+            width: 400px;
+            color: #ffffff;
+            background-color: blueviolet;
+            margin-bottom: 30px;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        .drop-box .file-name {
+            color: #333333;
+            padding: 10px;
+            margin-bottom: 5px;
+            background: #ffffff;
+        }
+
+        .hilight {
+            /* color: #cccccc; */
+            background-color: purple;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>最原始的上传文件操作 - 多文件上传  之 iframe 局部刷新</h1>
-    <div>
-        <iframe id="temp-iframe" name="temp-iframe" src="" style="display:none;"></iframe>
-        <form method="post" target="temp-iframe" action="http://localhost:8100" enctype="multipart/form-data">
+    <h1>文件上传</h1>
+    <div class="upload-box">
+        <h2>拖拽上传</h2>
+        <div class="drop-box" id="drop-box">
+            拖动文件到这里,开始上传
+        </div>
 
-        选择文件(可多选):
-            <input type="file" name="f1" id="f1" multiple/><br/> input 必须设置 name 属性，否则数据无法发送<br/>
-<br/>
-            标题：<input type="text" name="title"/><br/><br/><br/>
-
-        <button type="submit" id="btn-0">上 传</button>
-
-        </form>
+        <button type="button" id="btn-submit">上 传</button>
+    </div>
+    <div class="upload-box">
+        <h2>黏贴上传</h2>
+        <div class="editor-box" id="editor-box" contenteditable="true">
+            可以直接粘贴图片到这里直接上传
+        </div>
     </div>
 </body>
+
 </html>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
-var iframe = document.getElementById('temp-iframe');
+    const dropBox = document.getElementById('drop-box');
 
-iframe.addEventListener('load',function () {
-      var result = iframe.contentWindow.document.body.innerText;
-      //得到结果，做后续处理，如图片预览
-      if (result) {
-        var obj = JSON.parse(result);
-        if(obj && obj.fileUrl.length){
-          alert('上传成功');
-          
+    document.addEventListener('drop', function (e) {
+        e.preventDefault();
+    });
+    //禁用浏览器的拖放默认行为
+    document.addEventListener('dragenter', function (e) {
+        e.preventDefault();
+    });
+    document.addEventListener('dragover', function (e) {
+        e.preventDefault();
+    });
+    document.addEventListener('dragleave', function (e) {
+        e.preventDefault();
+    });
+
+    //设置拖拽事件
+    function openDropEvent() {
+
+        dropBox.addEventListener("dragover", function (e) {
+            e.preventDefault();
+        });
+
+        dropBox.addEventListener("dragenter", function (e) {
+            console.log('element dragenter')
+            dropBox.classList.add('hilight')
+            e.preventDefault()
+        })
+
+        dropBox.addEventListener("dragleave", function (e) {
+            console.log('elemenet dragleave')
+            dropBox.classList.remove('hilight')
+            e.preventDefault();
+        });
+
+        dropBox.addEventListener("drop", function (e) {
+            console.log('element drop')
+            dropBox.classList.remove('hilight')
+            e.preventDefault(); //取消浏览器默认拖拽效果，否则浏览器会默认打开文件
+            const fileList = e.dataTransfer.files; //获取拖拽中的文件对象
+            const len = fileList.length;//用来获取文件的长度（其实是获得文件数量）
+            console.log('fielist is array?', Array.isArray(fileList));
+
+            //检测是否是拖拽文件到页面的操作
+            if (!len) {
+                dropBox.classList.remove('over');
+                return;
+            }
+            // 因为是 FileList 对象 不能用 forEach
+            // 解决重复添加文件的处理
+            let files = window.willUploadFileList || []
+            for (var i = 0; i < fileList.length; i++) {
+                const fileName = fileList[i].name
+                if (files && !files.find(file => file.name === fileName)) {
+                    files.push(fileList[i])
+                }
+            }
+            dropBox.innerHTML = ""
+            files.forEach(file => {
+                const fileName = file.name
+                var divFileName = document.createElement('div')
+                divFileName.className = 'file-name'
+                divFileName.innerHTML = fileName
+                dropBox.appendChild(divFileName)
+            })
+            // for (var i = 0; i < fileList.length; i++) {
+            //     var f = fileList[i] //先预览图片
+            //     var divFileName = document.createElement('div')
+            //     var dropBox = document.getElementById('drop-dropBox')
+            //     divFileName.className = 'file-name'
+            //     divFileName.innerHTML = f.name
+            //     dropBox.appendChild(divFileName)
+            // }
+
+            //检测文件类型，比如必须的图片 这里可以做操作
+
+            // for(var i =0;i<len;i++){
+            //     fileList[i].type==='image/jpeg'//是否是图片文件
+            // }
+            //end
+            // let fileArry = []
+            // // 判断拖拽区是否存有文件
+            // if (window.willUploadFileList) {
+            //     for (var i = 0; i < window.willUploadFileList.length; i++) {
+            //         fileArry.push(window.willUploadFileList[i]);//支持多文件上传
+            //     }
+            // }
+            // for (var i = 0; i < fileList.length; i++) {
+            //     const fileName = fileList[i].name
+            //     if (!fileArry.find(file => file.name === fileName)) {
+            //         fileArry.push(fileList[i]);//支持多文件上传
+            //     }
+            // }
+            window.willUploadFileList = files
+
+            console.log(window.willUploadFileList)
+
+        }, false);
+    }
+    // 触发上面的设置
+    openDropEvent();
+
+    function submitDragUpload() {
+
+        var fileList = window.willUploadFileList || [];
+        console.log('fielist is array?', Array.isArray(fileList))
+        if (!fileList.length) {
+            alert('请选择文件');
+            return;
         }
-      console.log(obj);
-      }
-});
 
+        var fd = new FormData();   //构造FormData对象
+
+        // for (var i = 0; i < fileList.length; i++) {
+        //     fd.append('f1', fileList[i]);//支持多文件上传
+        // }
+        fileList.forEach((file, index) => {
+            fd.append(`f${index + 1}`, file);//支持多文件上传
+        })
+
+        // const config = {
+        //     onUploadProgress: progressEvent => {
+        //         const complete = (progressEvent.loaded / progressEvent.total * 100 | 0)
+        //         progressSpan.style.width = complete + '0px'
+        //         progressSpan.innerHTML = complete
+        //         if (complete === 100) {//进度条变色
+        //             progressSpan.classList.add('green');
+        //         }
+        //     }
+        // }
+        // const axios = require('axios')
+        axios.post('http://localhost:8100/upfile', fd).then((res) => {
+            if (res.status === 200) {
+                alert('上传成功')
+            }
+        })
+        // var xhr = new XMLHttpRequest();   //创建对象
+        // xhr.open('POST', 'http://localhost:8100/upfile', true);
+
+        // xhr.onreadystatechange = function () {
+        //     console.log('state change', xhr.readyState);
+        //     if (xhr.readyState == 4) {
+        //         var obj = JSON.parse(xhr.responseText);   //返回值
+        //         console.log(obj);
+        //         if (obj.fileUrl.length) {
+        //             alert('上传成功');
+        //         }
+        //     }
+        // }
+
+        // //注意 send 一定要写在最下面，否则 onprogress 只会执行最后一次 也就是100%的时候
+        // xhr.send(fd);//发送时  Content-Type默认就是: multipart/form-data; 
+    }
+    //绑定提交事件
+    document.getElementById('btn-submit').addEventListener('click', submitDragUpload);
+
+    // 粘贴上传
+    const editorBox = document.getElementById('editor-box');
+
+    // 监听粘贴事件
+    editorBox.addEventListener('paste', (event) => {
+        const data = (event.clipboardData || window.clipboardData);
+        console.dir(data);
+
+        const items = data.items;
+        const fileList = [];//存储文件数据
+        if (items && items.length) {
+            debugger
+            // 检索剪切板items
+            for (var i = 0; i < items.length; i++) {
+                console.log(items[i].getAsFile());
+                fileList.push(items[i].getAsFile());
+            }
+        }
+        console.log('data.items.length', data.items.length);
+        console.log('data.files.length', data.files.length);
+
+        window.willUploadFileList = fileList;
+        event.preventDefault();
+
+        submitPasteUpload();
+    });
+
+    function submitPasteUpload() {
+
+        const fileList = window.willUploadFileList || [];
+
+        if (!fileList.length) {
+            alert('请选择文件');
+            return;
+        }
+
+        const fd = new FormData();   //构造FormData对象
+
+        for (var i = 0; i < fileList.length; i++) {
+            fd.append('f1', fileList[i]);//支持多文件上传
+        }
+        // console.log(fileList)
+        axios.post('http://localhost:8100/upfile', fd).then((res) => {
+            if (res.status === 200) {
+                console.log(res)
+                if (res.data.fileUrl.length) {
+                    const img = document.createElement('img')
+                    img.src = res.data.fileUrl[0]
+                    img.style.width = '100px'
+                    insertNodeToEditor(editorBox, img)
+                    console.log('上传成功')
+                }
+            }
+        })
+    }
+
+    //光标处插入 dom 节点
+    function insertNodeToEditor(editor, ele) {
+        //插入dom 节点
+        let range;//记录光标位置对象
+        const node = window.getSelection().anchorNode;
+        // 这里判断是做是否有光标判断，因为弹出框默认是没有的
+        if (node != null) {
+            range = window.getSelection().getRangeAt(0);// 获取光标起始位置
+            range.insertNode(ele);// 在光标位置插入该对象
+        } else {
+            editor.append(ele);
+        }
+    }
 
 </script>

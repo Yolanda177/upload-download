@@ -223,8 +223,6 @@
           'responseType': 'blob'
         }).then((res) => {
           const { headers, data } = res
-          const fileReader = new FileReader()
-          console.log(res)
           console.log(window.URL.createObjectURL(data))
           const alink = document.createElement('a')
           alink.href = window.URL.createObjectURL(res.data)

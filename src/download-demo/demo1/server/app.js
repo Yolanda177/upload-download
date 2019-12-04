@@ -2,6 +2,7 @@
  * 服务入口
  */
 var http = require('http');
+const express = require('express')
 var koaStatic = require('koa-static');
 var path = require('path');
 const extname = path.extname;
@@ -11,16 +12,10 @@ const FS = require('fs')
 var Koa = require('koa2');
 const router = require('koa-router')()
 const send = require('koa-send')
-
+const xlsx = require('node-xlsx').default
 var app = new Koa();
+const request = require('request')
 var port = process.env.PORT || '8100';
-// app.use(koaBody({
-//     formidable: {
-//         //设置文件的默认保存目录，不设置则保存在系统临时目录下  os
-//         uploadDir: path.resolve(__dirname, '../static/uploads')
-//     },
-//     multipart: true // 支持文件上传
-// }));
 // router.get('/', (ctx) => {
 //     // 设置头类型, 如果不设置，会直接下载该页面
 //     ctx.type = 'html';
@@ -58,29 +53,62 @@ app.use(koaStatic(
 //     }
 
 // }
-app.use(async function (ctx) {
-    console.log(ctx);
+app.use(async function (ctx, next) {
+    console.log(ctx.path);
     const root = path.resolve(__dirname, '../static')
     const fpath = path.join(root, ctx.path);
     console.log(fpath);
-    const fstat = await stat(fpath);
-    if (ctx.path === '/html/download.html') {
-        console.log('index');
-        ctx.response.type = 'html';
-        const r = path.resolve(__dirname, '../static')
-        const p = path.join(r, '/html/download.html')
-        ctx.response.body = await fs.readFile(p, 'utf8')
-    } else if (fstat.isFile()) {
-        console.log('downloadfile');
-        ctx.set('Content-disposition', 'attachment')
-        ctx.type = extname(fpath);
-        console.log(ctx.type);
-        if (ctx.type === 'text/plain') {
-            ctx.body = FS.createReadStream(fpath, 'utf8')
-        } else {
-            ctx.response.type = ctx.type
-            ctx.body = FS.createReadStream(fpath, 'base64')
-        }
+    const { path } = ctx
+    switch (path) {
+        case '/html/download.html':
+            console.log('index');
+            ctx.response.type = 'html';
+            const r = path.resolve(__dirname, '../static')
+            const p = path.join(r, '/html/download.html')
+            ctx.response.body = await fs.readFile(p, 'utf8')
+            break
+        case '/download/fsExcel':
+            console.log('fsExcel');
+            const data = [
+                [1, 2, 3],
+                [true, false, null, 'sheetjs'],
+                ['foo', 'bar', new Date('2014-02-19T14:30Z'), '0.3'],
+                ['baz', null, 'qux'],
+            ];
+            const buffer = xlsx.build([{ name: 'mySheetName', data }]);
+            // Write file to the response
+            const tmpExcel = `filename.xlsx`;
+            fs.writeFileSync(
+                tmpExcel,
+                buffer,
+                {
+                    encoding: 'utf8',
+                },
+                err => {
+                    if (err) throw new Error(err);
+                },
+            );
+            ctx.set('Content-disposition', `attachment; filename="${tmpExcel}"`);
+            ctx.set('Content-Type', 'application/octet-stream');
+            ctx.body = fs.createReadStream(tmpExcel)
+            // delete file after sending to client
+            fs.unlinkSync(tmpExcel);
+            break
+        default:
+            const fstat = await stat(fpath)
+            if (fstat.isFile()) {
+                console.log('downloadfile');
+                ctx.set('Content-disposition', 'attachment')
+                ctx.type = extname(fpath);
+                console.log(ctx.type);
+                if (ctx.type === 'text/plain') {
+                    ctx.body = FS.createReadStream(fpath, 'utf8')
+                } else {
+                    ctx.response.type = ctx.type
+                    ctx.body = FS.createReadStream(fpath, 'base64')
+                }
+            }
+            break
     }
 })
 // app.use(main);
@@ -128,6 +156,9 @@ function readData(path) {
 // app.use(router.allowedMethods())
 // console.log(__dirname)
 // console.log(path.resolve(__dirname, '../static'))
+// app.use(async function (ctx) {
+//     console.log(ctx);
+// })
 
 var server = http.createServer(app.callback());
 server.listen(port);

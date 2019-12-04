@@ -28,9 +28,7 @@ app.use(koaStatic(
 
 //二次处理文件，修改名称
 app.use((ctx) => {
-    console.log(ctx.request.files);
-    
-    var files = ctx.request.files ? ctx.request.files.f1:[];//得到上传文件的数组
+    var files = ctx.request.files.f1;//得到上传文件的数组
     var result=[];
     console.log(files);
 
@@ -68,4 +66,4 @@ app.use((ctx) => {
  */
 var server = http.createServer(app.callback());
 server.listen(port);
-console.log('demo9 server start ......   ');
+console.log('demo3 server start ......   ');

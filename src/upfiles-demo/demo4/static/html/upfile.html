@@ -6,52 +6,330 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>基础-上传文件</title>
+    <style type="text/css">
+        .imgs img {
+            width: 100px;
+            display: inline-block;
+        }
+
+        .upload-box {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #666666;
+        }
+
+        .progress {
+            height: 20%;
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress span {
+            /* display: block; */
+            /* height: 20px; */
+            width: 0;
+            /* max-width: 80%; */
+            color: #000;
+            font-size: 12px;
+        }
+
+        .progress button {
+            /* position: absolute; */
+            /* top: 0; */
+            /* right: -60px; */
+            margin-left: 2px;
+        }
+
+        .blue {
+            background-color: blue;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .img-box {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .img-box .item {
+            width: 200px;
+            height: 130px;
+            border: solid 1px #ccc;
+            margin-right: 20px;
+            justify-content: space-between;
+            display: flex;
+            width: 200px;
+            flex-direction: column;
+        }
+
+        .img-box .item .file-item {
+            width: 100%;
+            height: 80%;
+        }
+
+        .img-box .item img {
+            width: 100%;
+            height: 80%;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.min.js"></script> -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <h1>多文件上传 之 xhr formdata</h1>
-    <div>
-        选择文件(可多选):
-        <input type="file" id="f1" multiple /><br /><br />
-        <button type="button" id="btn-submit">上 传</button>
+    <h1>文件上传</h1>
+    <div class="upload-box">
+        <h2>图片预览上传</h2>
+        <h3>注意：window.URL.createObjectURL或者FileReader 兼容 ie10+ </h3>
+        <div>
+            选择文件(可多选):
+            <input type="file" id="f1" multiple accept="image/gif,image/jpeg,image/jpg,image/png" /><br /><br />
+
+            标题：<input type="text" id="title" /><br /><br /><br />
+
+            <div class="imgs">
+
+            </div>
+
+            <button type="button" id="btn-submit">上 传</button>
+
+            </form>
+        </div>
     </div>
-    <script>
-        function submitUpload() {
-            //获得文件列表，注意这里不是数组，而是对象
-            var fileList = document.getElementById('f1').files;
-            if (!fileList.length) {
-                alert('请选择文件');
-                return;
-            }
-            var fd = new FormData();   //构造FormData对象
-            // fd.append('title', document.getElementById('title').value);
-
-            //多文件上传需要遍历添加到 fromdata 对象
-            for (var i = 0; i < fileList.length; i++) {
-                fd.append('f1', fileList[i]);//支持多文件上传
-            }
-            var xhr = new XMLHttpRequest();   //创建对象
-            console.log(xhr)
-            xhr.open('POST', 'http://localhost:8100/upfile', true);
-
-            xhr.send(fd);//发送时  Content-Type默认就是: multipart/form-data; 
-            xhr.onreadystatechange = function () {
-                console.log('state change', xhr.readyState);
-                if (this.readyState == 4 && this.status == 200) {
-                    var obj = JSON.parse(xhr.responseText);   //返回值
-                    console.log(obj);
-                    if (obj.fileUrl.length) {
-                        alert('上传成功');
-                    }
-                }
-            }
-        }
-
-        //绑定提交事件
-        document.getElementById('btn-submit').addEventListener('click', submitUpload);
-    </script>
+    <div class="upload-box">
+        <h2>图片预览上传及上传控制</h2>
+        <div>
+            选择文件(可多选):
+            <div class="addfile">
+                <input type="file" id="f2" multiple />
+            </div>
+            <div class="img-box"></div>
+            <button type="button" id="btn-submit2">上 传</button>
+        </div>
+    </div>
 </body>
 
 </html>
+<script>
+
+    //绑定事件
+    document.getElementById('f1').addEventListener('change', function (e) {
+        var files = document.getElementById('f1').files;
+        var imgsBox = document.getElementsByClassName('imgs')[0];
+        if (!files.length) {
+            return;
+        }
+
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var img = document.createElement('img');
+
+            //第一种：使用window.URL.createObjectURL
+            // img.src= window.URL.createObjectURL(file);
+            // img.onload = function () {
+            //     //显示要是否这块儿内存
+            //     window.URL.revokeObjectURL(this.src);
+            // }
+            //end 第一种
+
+
+            //第二种:使用FileReader
+            var reader = new FileReader();
+            reader.onload = (function (aImg) { return function (e) { aImg.src = e.target.result; }; })(img);
+            reader.readAsDataURL(file);
+            //end 第二种
+
+            imgsBox.appendChild(img);
+
+        }
+    });
+
+    function submitUpload() {
+
+        var fileList = document.getElementById('f1').files;
+        if (!fileList.length) {
+            alert('请选择文件');
+            return;
+        }
+
+        var fd = new FormData();   //构造FormData对象
+        fd.append('title', document.getElementById('title').value);
+        for (var i = 0; i < fileList.length; i++) {
+            fd.append('f1', fileList[i]);//支持多文件上传
+        }
+
+        fetch('http://localhost:8100/', {
+            method: 'POST',
+            body: fd
+        })
+            .then(response => response.json())
+            .then(response => {
+                console.log(response);
+                if (response.fileUrl.length) {
+                    alert('上传成功');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    //绑定提交事件
+    document.getElementById('btn-submit').addEventListener('click', submitUpload);
+
+    // 上传控制
+    //更改网络 为慢3g，就可以比较明显的看到进度条了
+    var fileMaxCount = 6;
+    var imgBox = document.getElementsByClassName('img-box')[0];
+    var willUploadFile = [];//保存待上传的文件以及相关附属信息
+    document.getElementById('f2').addEventListener('change', function (e) {
+        var fileList = document.getElementById('f1').files;
+
+        if (willUploadFile.length > fileMaxCount || fileList.length > fileMaxCount || (willUploadFile.length + fileList.length > fileMaxCount)) {
+            alert('最多只能同时上传' + fileMaxCount + '文件')
+            return
+        }
+        console.log(fileList)
+        for (var i = 0; i < fileList.length; i++) {
+            var f = fileList[i] //先预览图片
+            const imageType = /^image\/[jpeg|png|gif]/.test(f.type)
+            const item = document.createElement('div')
+            item.className = 'item'
+            const progress = document.createElement('div')
+            progress.className = 'progress'
+            progress.innerHTML = '<span class="blue"></span><button type="button">Abort</button>'
+            if (imageType) {
+                var img = document.createElement('img')
+                item.appendChild(img)
+                // 预览图片
+                img.src = window.URL.createObjectURL(f)
+                img.onload = function () {
+                    //加载完后清除这块内存
+                    window.URL.revokeObjectURL(this.src)
+                }
+                // // 这种方式有缺点 当同时有多个文件时 只能加载到最后一个 异步问题？
+                // img.file = fileList[i]
+                // const fileReader = new FileReader()
+                // // 开始读取指定的Blob中的内容。一旦完成，result属性中将包含一个data: URL格式的字符串以表示所读取文件的内容
+                // fileReader.readAsDataURL(f)
+                // // 读取完成后触发
+                // fileReader.onload = function (e) {
+                //     img.src = e.target.result
+                // }
+            } else {
+                const div = document.createElement('div')
+                div.innerHTML = f.name
+                div.className = 'file-item'
+                item.appendChild(div)
+            }
+            item.appendChild(progress)
+            imgBox.appendChild(item)
+
+            willUploadFile.push({
+                file: f,
+                item,
+                progress
+            })
+        }
+    })
+
+
+    function handleUploadFile({ file, progress }) {
+        const CancelToken = axios.CancelToken
+        let cancel
+        var progressSpan = progress.firstElementChild
+        var btnCancel = progress.getElementsByTagName('button')[0]
+
+        btnCancel.removeEventListener('click', function (e) {
+        })
+        btnCancel.addEventListener('click', function (e) {
+            // if (xhr && xhr.readyState !== 4) {
+            //     //取消上传
+            //     xhr.abort();
+            // }
+            cancel()
+        })
+
+        progressSpan.style.width = '0'
+        progressSpan.classList.remove('green')
+
+        var fd = new FormData()  //构造FormData对象
+        fd.append('f1', file)
+        const config = {
+            cancelToken: new CancelToken(function executor(c) {
+                // An executor function receives a cancel function as a parameter
+                cancel = c
+            }),
+            onUploadProgress: progressEvent => {
+                const complete = (progressEvent.loaded / progressEvent.total * 100 | 0)
+                progressSpan.style.width = complete + '%'
+                progressSpan.innerHTML = complete
+                if (complete === 100) {//进度条变色
+                    progressSpan.classList.add('green');
+                }
+            }
+        }
+        axios.post('http://localhost:8100/upfile', fd, config).then((res) => {
+            console.log(res)
+            console.log(file.name.slice(0, -4))
+            if (res.status === 200) {
+                console.log('上传成功')
+            }
+        })
+        // var xhr = new XMLHttpRequest();   //创建对象
+        // xhr.open('POST', 'http://localhost:8100/', true);
+
+        // xhr.onreadystatechange = function () {
+        //     console.log('state change', xhr.readyState);
+        //     //调用 abort 后，state 立即变成了4,并不会变成0
+        //     //增加自定义属性  xhr.uploaded
+        //     if (xhr.readyState == 4 && xhr.uploaded) {
+        //         var obj = JSON.parse(xhr.responseText);   //返回值
+        //         console.log(obj);
+        //         if (obj.fileUrl.length) {
+        //             //alert('上传成功');
+        //         }
+        //     }
+        // }
+
+        // xhr.onprogress = updateProgress;
+        // xhr.upload.onprogress = updateProgress;
+        // function updateProgress(event) {
+        //     if (event.lengthComputable) {
+        //         var completedPercent = (event.loaded / event.total * 100).toFixed(2);
+        //         progressSpan.style.width = completedPercent + '%';
+        //         progressSpan.innerHTML = completedPercent + '%';
+        //         if (completedPercent === 100) {//进度条变色
+        //             progressSpan.classList.add('green');
+        //         }
+        //         if (completedPercent >= 100) {
+        //             xhr.uploaded = true;
+        //         }
+        //         // console.log('已上传', completedPercent);
+        //     }
+        // }
+        // //注意 send 一定要写在最下面，否则 onprogress 只会执行最后一次 也就是100%的时候
+        // xhr.send(fd);//发送时  Content-Type默认就是: multipart/form-data; 
+        // return xhr;
+    }
+
+    //文件上传
+    function submitCtlUpload(willFiles) {
+        if (!willFiles.length) {
+            return
+        }
+        //遍历文件信息进行上传
+        willFiles.forEach(function (item) {
+            handleUploadFile({
+                file: item.file,
+                progress: item.progress
+            })
+        })
+    }
+    //绑定提交事件
+    document.getElementById('btn-submit2').addEventListener('click', function () {
+        submitCtlUpload(willUploadFile)
+    })
+
+</script>

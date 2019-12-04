@@ -1,26 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>基础-上传文件</title>
+    <style>
+        .upload-box {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #666666;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>最原始的上传文件操作 - 单文件上传</h1>
-    <h2>使用 form 表单直接请求,不用 js,页面会刷新</h2>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//oss.maxcdn.com/jquery.form/3.50/jquery.form.min.js"></script>
+    <h1>文件上传</h1>
+    <div class="upload-box">
+        <h2>使用 form 表单直接请求,不用 js,页面会刷新</h2>
+        <form method="post" action="http://localhost:8100/upload-form" enctype="multipart/form-data">
 
-   
-        <form method="post" action="http://localhost:8100" enctype="multipart/form-data">
-
-        <label for="f1">Choose file to upload</label>
-            <input type="file" id="f1" name="f1" style="display:none;"/><br/> input 必须设置 name 属性，否则数据无法发送<br/>
-<br/>
-            标题：<input type="text" name="title"/><br/><br/><br/>
-
-        <button type="submit" id="btn-0">上 传</button>
+            <div>Choose file to upload</div><br />
+            <!-- 如果是多文件上传，input 添加 multiple 属性即可 -->
+            单文件：<input type="file" id="f1" name="f1" /><br /><br />
+            多文件：<input type="file" id="f1" name="f1" multiple /><br /><br />
+            input 必须设置 name 属性，否则数据无法发送<br /><br />
+            <button type="submit" id="btn-0">上 传</button>
 
         </form>
+    </div>
+    <div class="upload-box">
+        <h2>使用 form 表单直接请求,利用 jQuery 的 ajaxSubmit 避免页面刷新</h2>
+        <form id="form2" method="post" action="http://localhost:8100/upfile-jq" enctype="multipart/form-data">
 
+            <label for="f1">Choose file to upload</label><br /><br />
+            <input type="file" id="f1" name="f1" /><br /><br />
+            <!-- 标题：<input type="text" name="title"/><br/><br/><br/> -->
+            <!-- <button type="submit" id="btn-0">上 传</button> -->
+            <button type="button" class="but2">上传2</button>
+        </form>
+    </div>
+    <div class="upload-box">
+        <h2>使用 form 表单直接请求,利用 iframe 避免页面刷新</h2>
+        <iframe id="temp-iframe" name="temp-iframe" src="" style="display:none;"></iframe>
+        <form method="post" target="temp-iframe" action="http://localhost:8100/upload-form"
+            enctype="multipart/form-data">
+
+            <div>Choose file to upload</div><br />
+            <input type="file" name="f1" id="f1" multiple /><br /><br />
+            <!-- 标题：<input type="text" name="title" /><br /><br /><br /> -->
+            <button type="submit" id="btn-0">上 传</button>
+
+        </form>
+    </div>
+    <script>
+        $(function () {
+            $(".but2").click(function () {
+                $('#form2').ajaxSubmit({
+                    success: function (responseText) {
+                        alert('上传成果！')
+                        console.log(responseText)
+                    }
+                })
+            })
+        })
+    </script>
 </body>
+
 </html>

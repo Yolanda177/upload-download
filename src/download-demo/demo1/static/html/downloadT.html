@@ -7,50 +7,144 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>基础-下载文件</title>
   <style type="text/css">
-    #location-img,
-    #location-zip,
-    #iframe {
+    .file-saver-img,
+    .file-saver-txt {
       padding: 10px;
       margin: 10px;
+    }
+
+    th,
+    td {
       border: 1px solid #666666;
     }
   </style>
+  <script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+  <script src="https://cdn.bootcss.com/xlsx/0.14.1/shim.min.js"></script>
+  <script src="https://cdn.bootcss.com/xlsx/0.14.1/xlsx.full.min.js"></script>
+  <script src='../util.js'></script>
 </head>
 
 <body>
   <div>
-    <h2>location.href & iframe 下载</h2>
+    <h2>fileSaver 插件</h2>
+    <p>是一种基于blob进行下载的方式,准确点说它能支持Blob、File和Url进行下载。</p>
+    <p>其实，基于 <b>Url</b> ,其实可以选择更简单的方式如 a 标签下载就可以了; 而基于 <b>File</b> ,一般场景是上传文件，需要用到 <b>FileReader</b> 的API</p>
+    <p>所以以下主要是有关基于 <b>blob</b> 的下载</p>
+    <p>首要工作是将文件转换成 blob</p>
+    <p>一般下载有两种，后端提供文件的url，前端通过这个url创建a标签或ifame标签下载即可；第二种情况就是后端返回的是一个文件流，此时需要在请求头设置responseType = blob
+      否者需要blob = new Blob([response], {type: type})
+      <p>下载文件流的两种方式：</p>
+
+      <p>1.Blob 和 msSaveBlob 以本地方式保存文件 </p>
+      window.navigator.msSaveBlob(blob, fileName)
+      <p>2.Bolb、URL和<a>配合下载</p>
+      <li>objectUrl = window.URL.createObjectURL(blob)创建新的URL表示指定Blob对象</li>
+      <li>a = document.createElement('a')创建a标签</li>
+      <li>a.href = objectUrl指定下载链接</li>
+      <li>a.download = fileName指定下载文件名</li>
+      <li>a.click()触发下载</li>
+      <li>a.remove()除a标签</li>
+      <li>window.URL.revokeObjectURL(objectUrl)释放</li>
+    </p>
     <div>
-      <div>
-        <button id="location-img">location.href下载图片</button>
+      <div class="file-saver-img">
+        <img src="../downloads/cutegirl.jpg" width="200px" height="200px">
+        <button id="download-image">fileSaver下载图片</button>
+      </div>
+      <div class="file-saver-txt">
+        <div>
+          <textarea id="textarea" class="textarea" placeholder="请输入文本内容..."></textarea>
+        </div>
+        <input id="textareaName" class="input" type="text" placeholder="textarea-download">.txt
+        <button id="download-txt">fileSaver下载文本</button>
       </div>
       <div>
-        <button id="location-zip">location.href下载zip</button>
+        <p>构造数据 --> 使用js-xlsx生成excel文件的数据 --> 转换成Blob数据 --> 下载</p>
+        <table id='table-excel' class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>One</th>
+              <th>Two</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Three</td>
+              <td>Four</td>
+            </tr>
+            <tr>
+              <td>Five</td>
+              <td>Six</td>
+            </tr>
+            <tr>
+              <td>Seven</td>
+              <td>Eight</td>
+            </tr>
+            <tr>
+              <td>Nine</td>
+              <td>Ten</td>
+            </tr>
+            <tr>
+              <td>Eleven</td>
+              <td>Twelve</td>
+            </tr>
+          </tbody>
+        </table>
+        <button id='download-excel' class='button is-danger'>excel文件下载</button>
       </div>
       <div>
-        <button id="iframe">
-          iframe下载
-        </button>
+        node下载
+        <button id="download-excel-node">配合node下载excel</button>
       </div>
     </div>
   </div>
 </body>
 <script>
-  function handleLocationImg() {
-    location.href = '../downloads/cutegirl.jpg'
+  /* 下载canvas */
+  function generateFilename(id, mime) {
+    const filename = document.getElementById(id).value || document.getElementById(id).placeholder;
+    return filename + mime;
   }
-  document.getElementById('location-img').addEventListener('click', handleLocationImg)
 
-  function handleLocationZip() {
-    location.href = '../downloads/package.zip'
+  // FileSaver 下载图片文件
+  const image = new Image();
+  image.setAttribute("crossOrigin", 'Anonymous');
+  image.src = '../downloads/cutegirl.jpg' + '?' + new Date().getTime();
+  image.onload = function () {
+    const imageDataUrl = image2base64(image);
+    const imageBlobData = dataUrl2Blob(imageDataUrl);
+    const downloadImageDom = document.getElementById('download-image');
+    downloadImageDom.addEventListener('click', () => {
+      saveAs(imageBlobData);
+    });
   }
-  document.getElementById('location-zip').addEventListener('click', handleLocationZip)
 
-  function handleDownIframe() {
-    const iframe = document.createElement('iframe')
-    iframe.style.display = 'none'
-    iframe.src = '../downloads/helpFile.docx'
-    document.body.appendChild(iframe)
-  }
-  document.getElementById('iframe').addEventListener('click', handleDownIframe)
+  // FileSaver 下载在线生成的文本文件
+  const txtDownloadDom = document.getElementById('download-txt');
+  txtDownloadDom.addEventListener('click', () => {
+    const textarea = document.getElementById('textarea');
+    const filename = generateFilename('textareaName', '.txt');
+    const textBlob = new Blob([textarea.value], { type: "text/plain;charset=utf-8" });
+    saveAs(textBlob, filename)
+  });
+
+  // 下载excel文件
+  const excelDownloadDom = document.getElementById('download-excel');
+  excelDownloadDom.addEventListener('click', () => {
+    // 注意：XLSX.uitls.table_to_book( 放入的是table 的DOM 节点 ) ，sheetjs.xlsx 即为导出表格的名字，可修改
+    const wb = XLSX.utils.table_to_book(document.querySelector('#table-excel'));
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+    try {
+      saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'table-excel.xlsx');
+    } catch (e) {
+      if (typeof console !== 'undefined') console.log(e, wbout)
+    }
+  });
+
+  // node 下载
+  const excelDownloadNodeDom = document.getElementById('download-excel-node')
+  excelDownloadNodeDom.addEventListener('click', () => {
+    download('/download/fsExcel')
+  })
+
 </script>

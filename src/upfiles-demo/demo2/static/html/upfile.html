@@ -1,26 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>基础-上传文件</title>
+    <style>
+        .upload-box {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #666666;
+        }
+
+        #progress {
+            height: 20px;
+            width: 300px;
+            margin-bottom: 30px;
+            border: dotted 1px #666666;
+        }
+
+        #progress span {
+            display: block;
+            height: 20px;
+            width: 0;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .blue {
+            background-color: blue;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .editor-box {
+            height: 200px;
+            width: 500px;
+            border: solid 1px #000;
+            margin-bottom: 30px;
+        }
+
+        .over {
+            background-color: green;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>最原始的上传文件操作 - 多文件上传</h1>
-    <h2>使用 form 表单直接请求,不用 js</h2>
-    <div>
-        <form method="post" action="http://localhost:8100" enctype="multipart/form-data">
-
-        选择文件(可多选):
-            <input type="file" name="f1" multiple/><br/> input 必须设置 name 属性，否则数据无法发送<br/>
-<br/>
-            标题：<input type="text" name="title"/><br/><br/><br/>
-
-        <button type="submit" id="btn-0">上 传</button>
-
-        </form>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <h1>文件上传</h1>
+    <div class="upload-box">
+        <input type="file" id="f1" multiple /><br /><br />
+        <button type="button" id="btn-submit">上 传</button>
+    </div>
+    <div class="upload-box">
+        <h2>带进度条提示：</h2>
+        <div id="progress">
+            <span class="blue"></span>
+        </div>
+        <input type="file" id="f2" multiple /><br /><br />
+        <button type="button" id="btn-submit2">上 传</button>
     </div>
 
+    <script>
+        function submitUpload() {
+            //获得文件列表，注意这里不是数组，而是对象
+            const fileList = document.getElementById('f1').files;
+            if (!fileList.length) {
+                alert('请选择文件');
+                return;
+            }
+            //构造FormData对象
+            const fd = new FormData();
+            //多文件上传需要遍历添加到 fromdata 对象
+            for (var i = 0; i < fileList.length; i++) {
+                fd.append(`f${i + 1}`, fileList[i]);//支持多文件上传
+            }
+            axios.post('http://localhost:8100/upfile', fd).then((res) => {
+                if (res.status === 200) {
+                    alert('上传成功')
+                }
+            })
+            // const xhr = new XMLHttpRequest();   //创建对象
+            // xhr.open('POST', 'http://localhost:8100/upfile', true)
+            // //发送时  Content-Type默认就是: multipart/form-data; 
+            // xhr.send(fd)
+            // xhr.onreadystatechange = function () {
+            //     console.log('state change', xhr.readyState);
+            //     if (this.readyState == 4 && this.status == 200) {
+            //         var obj = JSON.parse(xhr.responseText);   //返回值
+            //         console.log(obj);
+            //         if (obj.fileUrl.length) {
+            //             alert('上传成功');
+            //         }
+            //     }
+            // }
+        }
+
+        //绑定提交事件
+        document.getElementById('btn-submit').addEventListener('click', submitUpload);
+        function submitUpload2() {
+            //获得文件列表，注意这里不是数组，而是对象
+            const progressSpan = document.getElementById('progress').firstElementChild;
+            const fileList = document.getElementById('f2').files;
+            if (!fileList.length) {
+                alert('请选择文件');
+                return;
+            }
+            //构造FormData对象
+            const fd = new FormData();
+            //多文件上传需要遍历添加到 fromdata 对象
+            for (var i = 0; i < fileList.length; i++) {
+                fd.append(`f${i + 1}`, fileList[i]);//支持多文件上传
+            }
+            const config = {
+                onUploadProgress: progressEvent => {
+                    const complete = (progressEvent.loaded / progressEvent.total * 100 | 0)
+                    progressSpan.style.width = complete + '%'
+                    progressSpan.innerHTML = complete
+                    if (complete === 100) {//进度条变色
+                        progressSpan.classList.add('green');
+                    }
+                }
+            }
+            // const axios = require('axios')
+            axios.post('http://localhost:8100/upfile', fd, config).then((res) => {
+                if (res.status === 200) {
+                    alert('上传成功')
+                }
+            })
+        }
+
+        //绑定提交事件
+        document.getElementById('btn-submit2').addEventListener('click', submitUpload2);
+    </script>
 </body>
+
 </html>

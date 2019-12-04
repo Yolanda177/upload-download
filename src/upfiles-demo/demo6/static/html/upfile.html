@@ -70,7 +70,7 @@
         // fd.append('title', document.getElementById('title').value);
 
         for (var i = 0; i < fileList.length; i++) {
-            fd.append('f1', fileList[i]);//支持多文件上传
+            fd.append(`f${i + 1}`, fileList[i]);//支持多文件上传
         }
         const config = {
             onUploadProgress: progressEvent => {

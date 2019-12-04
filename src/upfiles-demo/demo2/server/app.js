@@ -12,7 +12,7 @@ var Koa = require('koa2');
 var app = new Koa();
 var port = process.env.PORT || '8100';
 
-var uploadHost= `http://localhost:${port}/uploads/`;
+var uploadHost = `http://localhost:${port}/uploads/`;
 
 app.use(koaBody({
     formidable: {
@@ -28,60 +28,66 @@ app.use(koaStatic(
 
 //二次处理文件，修改名称
 app.use((ctx) => {
-    // console.log(ctx.request.files);
-    var files = ctx.request.files.f1;//得到上传文件的数组
-    var result=[];
-    if(!Array.isArray(files)){
-        files=[files];
-    }
-    files && files.forEach(item=>{
-        console.log(item)
-        var path = item.path.replace(/\\/g, '/');
-        var fname = item.name;//原文件名称
-        var nextPath = path + fname;
-        if (item.size > 0 && path) {
-            //得到扩展名
-            var extArr = fname.split('.');
-            var ext = extArr[extArr.length - 1];
-            var nextPath = path + '.' + ext;
-            //重命名文件
-            fs.renameSync(path, nextPath);
+    var path = ctx.path
+    if (ctx.path === '/upfile') {
+        console.log(ctx.request.files);
+        var files = ctx.request.files.f1;//得到上传文件的数组
+        var result = [];
 
-            result.push(uploadHost+ nextPath.slice(nextPath.lastIndexOf('/') + 1));
+        if (!Array.isArray(files)) {//单文件上传容错
+            files = [files];
         }
-    });
 
-  
-    ctx.body = `{
-        "fileUrl":${JSON.stringify(result)}
-    }`;
+        files && files.forEach(item => {
+            var path = item.path.replace(/\\/g, '/');
+            var fname = item.name;//原文件名称
+            var nextPath = path + fname;
+            if (item.size > 0 && path) {
+                //得到扩展名
+                var extArr = fname.split('.');
+                var ext = extArr[extArr.length - 1];
+                var nextPath = path + '.' + ext;
+                //重命名文件
+                fs.renameSync(path, nextPath);
+
+                result.push(uploadHost + nextPath.slice(nextPath.lastIndexOf('/') + 1));
+            }
+        });
+
+
+        ctx.body = `{
+            "fileUrl":${JSON.stringify(result)}
+        }`;
+    }
 })
-
 
 //跨域处理
 app.use((ctx) => {
 
     //指定一个接口和返回数据
-    var path =ctx.path;
+    var path = ctx.path;
     debugger
-    if (path ==='/favicon.ico'){
+    if (path === '/favicon.ico') {
 
         console.log('receive req');
 
         //服务端通过 ctx.headers.origin 获取请求中的origin
         //ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 
-        ctx.body=JSON.stringify({
-            code:0,
-            msg:'success',
-            data:[]
+        ctx.body = JSON.stringify({
+            code: 0,
+            msg: 'success',
+            data: []
         });
     }
 })
+
+
+
 
 /**
  * Create HTTP server.
  */
 var server = http.createServer(app.callback());
 server.listen(port);
-console.log('demo2 server start ......   ');
+console.log('demo4 server start ......   ');
