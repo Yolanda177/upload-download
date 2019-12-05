@@ -28,23 +28,32 @@
         .green {
             background-color: green;
         }
+
+        .upload-box {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #666666;
+        }
     </style>
 </head>
 
 <body>
-    <h1>大文文件分片上传 之 xhr formdata </h1>
-    <div>
+    <h1>文件上传</h1>
+    <div class="upload-box">
+        <h2>分片上传</h2>
+        <div>
 
-        选择文件:
-        <input type="file" id="f1" /><br /><br />
+            选择文件:
+            <input type="file" id="f1" /><br /><br />
 
 
-        <div id="progress">
-            <span class="blue"></span>
+            <div id="progress">
+                <span class="blue"></span>
+            </div>
+
+            <button type="button" id="btn-submit">上 传</button>
+
         </div>
-
-        <button type="button" id="btn-submit">上 传</button>
-
     </div>
 </body>
 
@@ -71,11 +80,13 @@
         // 相信大家都对Blob 对象有所了解，它表示原始数据,也就是二进制数据，
         // 同时提供了对数据截取的方法slice,而 File 继承了Blob的功能，所以可以直接使用此方法对数据进行分段截图
         if (file.size > chunkSize) { // 开始拆分文件
-            const start = 0
-            const end = 0
+            let start = 0
+            let end = 0
             while (true) {
                 end += chunkSize
-                const blob = file.slice(start, end)
+                console.log(`${start}---${end}`)
+                let blob = file.slice(start, end)
+                console.log(blob)
                 start += chunkSize
                 if (!blob.size) {
                     break //拆分结束

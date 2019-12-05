@@ -54,35 +54,35 @@ app.use((ctx) => {
             "fileUrl":${JSON.stringify(result)}
         }`;
     }
-    // 检测接口地址为 /upfile
-    if (ctx.path === '/upfile-jq') {
-        console.log(ctx.request.files);
-        var file = ctx.request.files ? ctx.request.files.f1 : null; //得到文件对象
-        if (file) {
+    // // 检测接口地址为 /upfile-jq
+    // if (ctx.path === '/upfile-jq') {
+    //     console.log(ctx.request.files);
+    //     var file = ctx.request.files ? ctx.request.files.f1 : null; //得到文件对象
+    //     if (file) {
 
-            var path = file.path.replace(/\\/g, '/');
-            var fname = file.name; //原文件名称
-            var nextPath = '';
-            if (file.size > 0 && path) {
-                //得到扩展名
-                var extArr = fname.split('.');
-                var ext = extArr[extArr.length - 1];
-                nextPath = path + '.' + ext;
-                //重命名文件
-                fs.renameSync(path, nextPath);
-            }
-            //以 json 形式输出上传文件的存储地址
-            ctx.body = getRenderData({
-                data: `${uploadHost}${nextPath.slice(nextPath.lastIndexOf('/') + 1)}`
-            });
-        } else {
-            ctx.body = getRenderData({
-                code: 1,
-                msg: 'file is null'
-            });
-        }
+    //         var path = file.path.replace(/\\/g, '/');
+    //         var fname = file.name; //原文件名称
+    //         var nextPath = '';
+    //         if (file.size > 0 && path) {
+    //             //得到扩展名
+    //             var extArr = fname.split('.');
+    //             var ext = extArr[extArr.length - 1];
+    //             nextPath = path + '.' + ext;
+    //             //重命名文件
+    //             fs.renameSync(path, nextPath);
+    //         }
+    //         //以 json 形式输出上传文件的存储地址
+    //         ctx.body = getRenderData({
+    //             data: `${uploadHost}${nextPath.slice(nextPath.lastIndexOf('/') + 1)}`
+    //         });
+    //     } else {
+    //         ctx.body = getRenderData({
+    //             code: 1,
+    //             msg: 'file is null'
+    //         });
+    //     }
 
-    }
+    // }
 });
 
 /**

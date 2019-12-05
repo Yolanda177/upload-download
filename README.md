@@ -9,12 +9,14 @@ $ npm  install
 如
 
 ```
+node ./src/upfiles-demo/demo-form/server/app.js
+node ./src/upfiles-demo/demo-formdata/server/app.js
+node ./src/upfiles-demo/demo-drag-paste/server/app.js
+node ./src/upfiles-demo/demo-slice-file/server/app.js
+node ./src/upfiles-demo/demo-slice-file-update/server/app.js
+
+
 node ./src/cors-demo/demo1/server/app.js
-node ./src/upfiles-demo/demo1/server/app.js
-node ./src/upfiles-demo/demo2/server/app.js
-node ./src/upfiles-demo/demo3/server/app.js
-node ./src/upfiles-demo/demo4/server/app.js
-node ./src/upfiles-demo/demo5/server/app.js
 node ./src/upfiles-demo/demo6/server/app.js
 node ./src/upfiles-demo/demo7/server/app.js
 node ./src/upfiles-demo/demo8/server/app.js
