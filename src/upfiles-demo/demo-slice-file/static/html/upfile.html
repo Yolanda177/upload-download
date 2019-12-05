@@ -68,6 +68,7 @@
     function submitUpload() {
         const chunkSize = 10 * 1024 * 1000 // 分片大小，可设置为 10M，100M
         file = document.getElementById('f1').files[0] // 获取文件对象
+        console.log(file);
         if (!file) {
             alert('请选择上传文件')
             return;
@@ -128,7 +129,9 @@
                         if (complete === 100) { // 进度条变色
                             progressSpan.classList.add('green')
                         }
-                    }
+                    },
+                    // 不是必须的
+                    headers: { 'Content-Range': `bytes ${i * chunkSize}-/${fileChunks[i].size + i * chunkSize}` }
                 }
                 const res = await axios.post('http://localhost:8100/upfile', fd, config)
                 console.log(res)

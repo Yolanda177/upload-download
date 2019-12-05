@@ -7,6 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>大文件上传</title>
     <style type="text/css">
+        .upload-box {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #666666;
+        }
+
         #progress {
             height: 20px;
             width: 300px;
@@ -32,26 +38,29 @@
 </head>
 
 <body>
-    <h1>大文文件分片上传 之 断点续传</h1>
-    <h3>为什么需要断点续传？</h3>
+    <h1>文件上传</h1>
+    <!-- <h3>为什么需要断点续传？</h3>
     <p>
         使用场景：在上传的过程中，如果网络中断或服务器中断了，我们需要把已上传的片段信息 hash保存到本地，然后当网络恢复的时候，我们继续上传。那么继续上传的时候，
         根据已上传文件保存的信息，通过 hash 值判断当前的分段是否上传过，跳过已上传的部分，只传未上传的部分。
         缺点：使用这种方式有个比较耗费资源的部分，就是需要对比分片的 hash 值，但是相对于我们重新上传消耗的时间来讲，这些可以忽略了。
         简单模拟断点续传：用每个 chunk 的索引（顺序值）代替 hash 值，构建一个简单对象，保存是否上传到了服务器。
-    </p>
-    <div>
+    </p> -->
+    <div class="upload-box">
+        <h2>断点续传</h2>
+        <div>
 
-        选择文件:
-        <input type="file" id="f1" /><br /><br />
+            选择文件:
+            <input type="file" id="f1" /><br /><br />
 
 
-        <div id="progress">
-            <span class="blue"></span>
+            <div id="progress">
+                <span class="blue"></span>
+            </div>
+
+            <button type="button" id="btn-submit">上 传</button>
+
         </div>
-
-        <button type="button" id="btn-submit">上 传</button>
-
     </div>
 </body>
 
