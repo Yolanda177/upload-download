@@ -9,22 +9,20 @@ $ npm  install
 如
 
 ```
-node ./src/upfiles-demo/demo-form/server/app.js
-node ./src/upfiles-demo/demo-formdata/server/app.js
-node ./src/upfiles-demo/demo-drag-paste/server/app.js
-node ./src/upfiles-demo/demo-slice-file/server/app.js
-node ./src/upfiles-demo/demo-slice-file-update/server/app.js
+node ./src/upfiles-demo/demo-a1-form/server/app.js
+node ./src/upfiles-demo/demo-a2-formdata/server/app.js
+node ./src/upfiles-demo/demo-a3-drag-paste/server/app.js
+node ./src/upfiles-demo/demo-a4-slice-file/server/app.js
+node ./src/upfiles-demo/demo-a5-slice-file-update/server/app.js
 
-
-node ./src/cors-demo/demo1/server/app.js
-node ./src/upfiles-demo/demo6/server/app.js
-node ./src/upfiles-demo/demo7/server/app.js
-node ./src/upfiles-demo/demo8/server/app.js
-node ./src/upfiles-demo/demo9/server/app.js
-node ./src/upfiles-demo/demo10/server/app.js
-node ./src/upfiles-demo/demo11/server/app.js
-node ./src/upfiles-demo/demo12/server/app.js
-node ./src/upfiles-demo/demo13/server/app.js
+node ./src/upfiles-demo/demo-check-image/server/app.js
+node ./src/upfiles-demo/demo-control-upload/server/app.js
+node ./src/upfiles-demo/demo-fetch-formdata/server/app.js
+node ./src/upfiles-demo/demo-formdata-progress/server/app.js
+node ./src/upfiles-demo/demo-iframe-upload/server/app.js
+node ./src/upfiles-demo/demo-multiple-progress/server/app.js
+node ./src/upfiles-demo/demo-multiple-upload/server/app.js
+node ./src/upfiles-demo/demo-paste/server/app.js
 
 node ./src/download-demo/demo1/server/app.js
 ```
