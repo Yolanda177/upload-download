@@ -13,13 +13,15 @@
             border: 1px solid #666666;
         }
 
-        #progress {
+        #progress,
+        #progress2 {
             height: 20px;
             width: 300px;
             margin-bottom: 30px;
         }
 
-        #progress span {
+        #progress span,
+        #progress2 span {
             display: block;
             height: 20px;
             width: 0;
@@ -57,6 +59,9 @@
             <div id="progress">
                 <span class="blue"></span>
             </div>
+            <div id="progress2">
+                <span class="blue"></span>
+            </div>
 
             <button type="button" id="btn-submit">上 传</button>
             <button type="button" id="btn-abort">中断</button>
@@ -89,6 +94,10 @@
         const progressSpan = document.getElementById('progress').firstElementChild // 简单配一下进度条
         progressSpan.style.width = '0'
         progressSpan.classList.remove('green')
+
+        const progressSpan2 = document.getElementById('progress2').firstElementChild // 简单配一下进度条
+        progressSpan2.style.width = '0'
+        progressSpan2.classList.remove('green')
 
         if (!file) {
             alert('请选择文件')
@@ -148,12 +157,18 @@
             } else if (i < chunks) {
                 const config = {
                     onUploadProgress: progressEvent => {
-                        const complete = ((progressEvent.loaded + i * chunkSize) / file.size * 100 | 0)
+                        const complete = (progressEvent.loaded / progressEvent.total * 100)
                         progressSpan.style.width = complete + '%'
                         progressSpan.innerHTML = complete
                         if (complete === 100) { // 进度条变色
                             progressSpan.classList.add('green')
                         }
+                        // progressSpan2.style.width = complete + '%'
+                        // progressSpan2.innerHTML = complete
+                        // if (complete === 100) { // 进度条变色
+                        //     progressSpan2.classList.add('green')
+                        // }
+
                     }
                 }
                 const res = await axios.post('http://localhost:8100/upfile', fd, config)

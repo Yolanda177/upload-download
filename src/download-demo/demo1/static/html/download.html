@@ -96,6 +96,7 @@
         // 将图片url转换成 base64
         // 原理： 利用canvas.toDataURL的API转化成base64
         const imageUrlToBase64 = (img) => {
+          debugger
           const canvas = document.createElement("canvas")
           canvas.width = img.width
           canvas.height = img.height
@@ -142,8 +143,8 @@
           const downloadDataUrlDom = document.createElement('a')
           // downloadDataUrlDom.setAttribute('href', imageDataUrl)
           // // 第二种方式 在第一种方式基础上
-          const imageBlobData = base64ToBlob(imageDataUrl)
-          console.log(imageBlobData);
+          // const imageBlobData = base64ToBlob(imageDataUrl)
+          // console.log(imageBlobData);
           debugger
           // const base64Data = await blobToBase64(imageBlobData)
           // 生成 blob:URLs 
@@ -161,10 +162,10 @@
       downloadTxt() {
         const alink = document.createElement('a')
         axios.post('http://localhost:8100/downloads/test.txt').then(res => {
-          console.log(res);
           const blob = new Blob([res.data])
           alink.setAttribute('href', URL.createObjectURL(blob))
           alink.setAttribute('download', '')
+          debugger
           alink.click()
           URL.revokeObjectURL(res.data)
         })
@@ -182,7 +183,8 @@
           let n = bStr.length
           const unit8Array = new Uint8Array(n)
           while (n--) {
-            unit8Array[n] = bStr.charCodeAt(n)
+            // 以对象的方式或使用数组下标索引的方式引用数组中的元素
+            unit8Array[n] = bStr.charCodeAt(n) //返回指定位置的字符的 Unicode 编码
           }
           return new Blob([unit8Array], { type: mime })
         }
@@ -204,7 +206,7 @@
 
       // 通过axios请求获取图片
       axiosDownImage() {
-        axios.get('http://58.246.138.178:8790/dme/api/models/v2/img/96fa2eed8bd143efa233aca983db45dd', {
+        axios.get('http://img.mp.itc.cn/upload/20170605/9dea8e0dd718472aa913dae6a1e2b94b_th.jpg', {
           'responseType': 'blob'
         }).then(res => {
           console.log(res);
@@ -213,7 +215,7 @@
           const alink = document.createElement('a')
           alink.setAttribute('href', URL.createObjectURL(res.data))
           debugger
-          alink.setAttribute('download', `cutegirl.${typeArr[1]}`)
+          alink.setAttribute('download', `cutedog.${typeArr[1]}`)
           alink.click()
           URL.revokeObjectURL(res.data)
         })
@@ -226,6 +228,7 @@
           console.log(window.URL.createObjectURL(data))
           const alink = document.createElement('a')
           alink.href = window.URL.createObjectURL(res.data)
+          debugger
           // 若设置了Content-Disposition 则文件名可从header读取
           alink.setAttribute('download', 'test')
           alink.click()

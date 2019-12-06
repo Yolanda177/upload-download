@@ -66,7 +66,7 @@
     //服务端生成临时文件，服务端接受一个文件结束的标志 ，然后将所有的文件进行合并成一个文件，清理临时文件。 返回结果（看情况）
     let file
     function submitUpload() {
-        const chunkSize = 10 * 1024 * 1000 // 分片大小，可设置为 10M，100M
+        const chunkSize = 20 * 1024 * 1000 // 分片大小，可设置为 10M，100M
         file = document.getElementById('f1').files[0] // 获取文件对象
         console.log(file);
         if (!file) {
@@ -123,7 +123,7 @@
             } else if (i < chunks) {
                 const config = {
                     onUploadProgress: progressEvent => {
-                        const complete = ((progressEvent.loaded + i * chunkSize) / file.size * 100 | 0)
+                        const complete = (progressEvent.loaded / progressEvent.total * 100 | 0)
                         progressSpan.style.width = complete + '%'
                         progressSpan.innerHTML = complete
                         if (complete === 100) { // 进度条变色
@@ -136,6 +136,8 @@
                 const res = await axios.post('http://localhost:8100/upfile', fd, config)
                 console.log(res)
                 if (res.status === 200) {
+                    progressSpan.style.width = '0'
+                    progressSpan.classList.remove('green')
                     i++
                     upLoadInOrder()
                 }

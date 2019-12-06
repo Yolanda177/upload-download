@@ -131,7 +131,8 @@
   // 下载excel文件
   const excelDownloadDom = document.getElementById('download-excel');
   excelDownloadDom.addEventListener('click', () => {
-    // 注意：XLSX.uitls.table_to_book( 放入的是table 的DOM 节点 ) ，sheetjs.xlsx 即为导出表格的名字，可修改
+    // 注意：XLSX.uitls.table_to_book( 放入的是table 的DOM 节点 ) ，
+    // sheetjs.xlsx 即为导出表格的名字，可修改
     const wb = XLSX.utils.table_to_book(document.querySelector('#table-excel'));
     const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
     try {

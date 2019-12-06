@@ -90,4 +90,4 @@ app.use((ctx) => {
  */
 var server = http.createServer(app.callback());
 server.listen(port);
-console.log('demo3 server start ......   ');
+console.log('demo-a3-drag-paste server start ......   ');

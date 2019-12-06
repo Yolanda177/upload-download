@@ -58,8 +58,8 @@ app.use(async function (ctx, next) {
     const root = path.resolve(__dirname, '../static')
     const fpath = path.join(root, ctx.path);
     console.log(fpath);
-    const { path } = ctx
-    switch (path) {
+
+    switch (ctx.path) {
         case '/html/download.html':
             console.log('index');
             ctx.response.type = 'html';
@@ -162,4 +162,4 @@ function readData(path) {
 
 var server = http.createServer(app.callback());
 server.listen(port);
-console.log('demo1 server start ......   ');
+console.log('download demo1 server start ......   ');

@@ -74,6 +74,7 @@
         function submitUpload() {
             //获得文件列表，注意这里不是数组，而是对象
             const fileList = document.getElementById('f1').files;
+            console.log(fileList);
             if (!fileList.length) {
                 alert('请选择文件');
                 return;
@@ -81,9 +82,9 @@
             //构造FormData对象
             const fd = new FormData();
             //多文件上传需要遍历添加到 fromdata 对象
-            for (var i = 0; i < fileList.length; i++) {
-                fd.append(`f${i + 1}`, fileList[i]);//支持多文件上传
-            }
+            Array.from(fileList).forEach((item, index) => {
+                fd.append(`f${index + 1}`, item);
+            })
             axios.post('http://localhost:8100/upfile', fd).then((res) => {
                 if (res.status === 200) {
                     alert('上传成功')
@@ -111,6 +112,7 @@
             //获得文件列表，注意这里不是数组，而是对象
             const progressSpan = document.getElementById('progress').firstElementChild;
             const fileList = document.getElementById('f2').files;
+            console.log(fileList);
             if (!fileList.length) {
                 alert('请选择文件');
                 return;
@@ -131,7 +133,6 @@
                     }
                 }
             }
-            // const axios = require('axios')
             axios.post('http://localhost:8100/upfile', fd, config).then((res) => {
                 if (res.status === 200) {
                     alert('上传成功')
