@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>大文件上传</title>
+    <title>基础-上传文件</title>
     <style type="text/css">
         .upload-box {
             padding: 10px;
@@ -82,12 +82,12 @@
     //把大文件分成每10M 一块进行上传，发送到服务器同时携带一个标志 暂时用当前的时间戳 ，
     //服务端生成临时文件，服务端接受一个文件结束的标志 ，然后将所有的文件进行合并成一个文件，清理临时文件。 返回结果（看情况）
     function submitUpload() {
-        debugger
-        const chunkSize = 10 * 1000 * 1024;//2m
+        const chunkSize = 20 * 1000 * 1024;//2m
 
         const file = document.getElementById('f1').files[0];
         const chunks = Math.ceil(file.size / chunkSize) // 计算这个文件可以切成几块
         console.log(`总共${chunks}个分片`)
+        debugger
         const token = (+ new Date()) // 文件唯一标识，用于最后合并文件
         const fileChunks = []
 
@@ -124,12 +124,12 @@
         } else {
             fileChunks.push(file.slice(0));
         }
-
+        console.log(fileChunks);
         const uploadedInfo = getUploadedFromStorage()
-        console.log(uploadedInfo);
 
         let i = 0
         const upLoadInOrder = async () => {
+            debugger
             // const uploadedIndex = uploadedInfo.findIndex(up => up === true)
             if (uploadedInfo[i]) {
                 // 说明有分片缓存
@@ -141,6 +141,7 @@
             fd.append('token', token) // 与后端协调分片需要传送过去的参数，一般是文件的标识id，分片长度，分片的序号、所占长度等等
             fd.append('f1', fileChunks[i])
             fd.append('index', i)
+            debugger
             if (i === chunks) {
                 console.log('上传完成，发送合并请求')
                 const formD = new FormData()
@@ -175,6 +176,8 @@
                 console.log(res)
                 if (res.status === 200) {
                     console.log('sendChunkCount', i)
+                    progressSpan.style.width = '0'
+                    progressSpan.classList.remove('green')
                     setUploadedToStorage(i)
                     i++
                     upLoadInOrder()

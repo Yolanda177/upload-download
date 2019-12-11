@@ -7,6 +7,12 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>基础-下载文件</title>
   <style type="text/css">
+    .download-box {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #666666;
+    }
+
     .file-saver-img,
     .file-saver-txt {
       padding: 10px;
@@ -26,13 +32,11 @@
 
 <body>
   <div>
-    <h2>fileSaver 插件</h2>
-    <p>是一种基于blob进行下载的方式,准确点说它能支持Blob、File和Url进行下载。</p>
-    <p>其实，基于 <b>Url</b> ,其实可以选择更简单的方式如 a 标签下载就可以了; 而基于 <b>File</b> ,一般场景是上传文件，需要用到 <b>FileReader</b> 的API</p>
-    <p>所以以下主要是有关基于 <b>blob</b> 的下载</p>
+    <h1>使用 FileSaver 下载文件</h1>
+    <!-- <p>是一种基于blob进行下载的方式,准确点说它能支持Blob、File和Url进行下载。</p>
+
     <p>首要工作是将文件转换成 blob</p>
-    <p>一般下载有两种，后端提供文件的url，前端通过这个url创建a标签或ifame标签下载即可；第二种情况就是后端返回的是一个文件流，此时需要在请求头设置responseType = blob
-      否者需要blob = new Blob([response], {type: type})
+    <p>一般情况下，后端会提供下载文件的文件流给我们，这时候我们
       <p>下载文件流的两种方式：</p>
 
       <p>1.Blob 和 msSaveBlob 以本地方式保存文件 </p>
@@ -45,12 +49,16 @@
       <li>a.click()触发下载</li>
       <li>a.remove()除a标签</li>
       <li>window.URL.revokeObjectURL(objectUrl)释放</li>
-    </p>
-    <div>
+    </p> -->
+    <div class="download-box">
+      <h2>下载图片</h2>
       <div class="file-saver-img">
         <img src="../downloads/cutegirl.jpg" width="200px" height="200px">
         <button id="download-image">fileSaver下载图片</button>
       </div>
+    </div>
+    <div class="download-box">
+      <h2>下载Txt</h2>
       <div class="file-saver-txt">
         <div>
           <textarea id="textarea" class="textarea" placeholder="请输入文本内容..."></textarea>
@@ -58,47 +66,52 @@
         <input id="textareaName" class="input" type="text" placeholder="textarea-download">.txt
         <button id="download-txt">fileSaver下载文本</button>
       </div>
-      <div>
-        <p>构造数据 --> 使用js-xlsx生成excel文件的数据 --> 转换成Blob数据 --> 下载</p>
-        <table id='table-excel' class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-          <thead>
-            <tr>
-              <th>One</th>
-              <th>Two</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Three</td>
-              <td>Four</td>
-            </tr>
-            <tr>
-              <td>Five</td>
-              <td>Six</td>
-            </tr>
-            <tr>
-              <td>Seven</td>
-              <td>Eight</td>
-            </tr>
-            <tr>
-              <td>Nine</td>
-              <td>Ten</td>
-            </tr>
-            <tr>
-              <td>Eleven</td>
-              <td>Twelve</td>
-            </tr>
-          </tbody>
-        </table>
-        <button id='download-excel' class='button is-danger'>excel文件下载</button>
-      </div>
-      <div>
-        node下载
-        <button id="download-excel-node">配合node下载excel</button>
-      </div>
     </div>
+    <div class="download-box">
+      <h2>配合 js-xlsx 在线生成 excel 并下载</h2>
+      <p>构造数据 --> 使用js-xlsx生成excel文件的数据 --> 转换成Blob数据 --> 下载</p>
+      <table id='table-excel' class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>One</th>
+            <th>Two</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Three</td>
+            <td>Four</td>
+          </tr>
+          <tr>
+            <td>Five</td>
+            <td>Six</td>
+          </tr>
+          <tr>
+            <td>Seven</td>
+            <td>Eight</td>
+          </tr>
+          <tr>
+            <td>Nine</td>
+            <td>Ten</td>
+          </tr>
+          <tr>
+            <td>Eleven</td>
+            <td>Twelve</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <button id='download-excel' class='button is-danger'>excel文件下载</button>
+      </p>
+    </div>
+    <div class="download-box">
+      node下载
+      <button id="download-excel-node">配合node下载excel</button>
+    </div>
+    <button id="test-dom">下载zip</button>
   </div>
 </body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
   /* 下载canvas */
   function generateFilename(id, mime) {
@@ -114,14 +127,21 @@
     const imageDataUrl = image2base64(image);
     const imageBlobData = dataUrl2Blob(imageDataUrl);
     const downloadImageDom = document.getElementById('download-image');
-    downloadImageDom.addEventListener('click', () => {
+    downloadImageDom.addEventListener('click', function () {
+      debugger
+      // FileSaver
       saveAs(imageBlobData);
+      const a = document.createElement('a')
+      a.href = imageDataUrl
+      a.click()
+      // const imageBlobUrl = window.URL.createObjectURL(imageBlobData)
+      // navigator.msSaveOrOpenBlob(imageBlobData, 'cuteGirl.jpg')
     });
   }
 
   // FileSaver 下载在线生成的文本文件
   const txtDownloadDom = document.getElementById('download-txt');
-  txtDownloadDom.addEventListener('click', () => {
+  txtDownloadDom.addEventListener('click', function () {
     const textarea = document.getElementById('textarea');
     const filename = generateFilename('textareaName', '.txt');
     const textBlob = new Blob([textarea.value], { type: "text/plain;charset=utf-8" });
@@ -130,22 +150,68 @@
 
   // 下载excel文件
   const excelDownloadDom = document.getElementById('download-excel');
-  excelDownloadDom.addEventListener('click', () => {
-    // 注意：XLSX.uitls.table_to_book( 放入的是table 的DOM 节点 ) ，
-    // sheetjs.xlsx 即为导出表格的名字，可修改
-    const wb = XLSX.utils.table_to_book(document.querySelector('#table-excel'));
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
-    try {
-      saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'table-excel.xlsx');
-    } catch (e) {
-      if (typeof console !== 'undefined') console.log(e, wbout)
-    }
+  excelDownloadDom.addEventListener('click', function () {
+    // // 注意：XLSX.uitls.table_to_book( 放入的是table 的DOM 节点 ) ，
+    // // sheetjs.xlsx 即为导出表格的名字，可修改
+    // const wb = XLSX.utils.table_to_book(document.querySelector('#table-excel'));
+    // console.log(wb);
+    // const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+    // try {
+    //   saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'table-excel.xlsx');
+    // } catch (e) {
+    //   if (typeof console !== 'undefined') console.log(e, wbout)
+    // }
+
+    // json_to_sheet
+    const json = [
+      { "name": "John", "city": "Seattle" },
+      { "name": "Mike", "city": "Los Angeles" },
+      { "name": "Zach", "city": "New York" }
+    ]
+    const sheet = XLSX.utils.json_to_sheet(json)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, sheet, 'people')
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' })
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'table-excel.xlsx')
   });
 
   // node 下载
   const excelDownloadNodeDom = document.getElementById('download-excel-node')
-  excelDownloadNodeDom.addEventListener('click', () => {
+  excelDownloadNodeDom.addEventListener('click', function () {
     download('/download/fsExcel')
+  })
+
+  const testDom = document.getElementById('test-dom')
+  testDom.addEventListener('click', () => {
+    // const src = 'http://52.83.103.252:8086/dgp-server-web-nr/rest/pas/private/dataform/v2/download'
+    const src = 'http://58.246.138.178:8790/dme/api/models/v1/export/60473f47e746405b892661cfe445b585?expalg=1&expds=1'
+    axios.get(src, {
+      'responseType': 'blob'
+    }
+    ).then(res => {
+      const blob = res.data
+
+      console.log(res);
+      debugger
+      saveAs(blob)
+      // const blobUrl = window.URL.createObjectURL(blob)
+      // const a = document.createElement('a')
+      // a.href = blobUrl
+      // a.click()
+    })
+    console.log(src);
+    // axios({
+    //   method: 'post',
+    //   url: src,
+    //   responseType: 'blob',
+    //   headers: {
+    //     'Cookies': 'SESSION=805805ad-a26a-49a4-8ac9-36fd91360056; redirect=/Portal; session-key=1599e613-3b29-45d2-abf6-2d7c3bdcc43c; region-key=330500000000; dist-token=805805ad-a26a-49a4-8ac9-36fd91360056'
+    //   }
+    // }).then(res => {
+    //   console.log(res);
+    //   const blob = res.data
+    //   saveAs(blob, 'hahha.zip')
+    // })
   })
 
 </script>

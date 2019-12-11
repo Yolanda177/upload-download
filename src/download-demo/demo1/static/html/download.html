@@ -15,6 +15,10 @@
       margin: 10px;
       border: 1px solid #666666;
     }
+
+    div.button {
+      padding: 5px;
+    }
   </style>
 </head>
 
@@ -57,11 +61,12 @@
       </div>
       <div class="js-down">
         (涉及跨域情况利用js修改在线预览为提示下载的几种方式：)
-        <div id="downloadDataUrl" @click="downloadImage">利用data:URL下载图片(提示下载)</div>
-        <div @click="axiosDownImage">axios下载Image</div>
-        <div @click="axiosDownPdf">axios下载PDF</div>
-        <div @click="downloadTxt">下载Txt</div>
-        <div @click="downloadPDF">下载pdf</div>
+        <div>下载一张来自网上的图片</div>
+        <button class="button" id="downloadDataUrl" @click="downloadImage">利用data:URL下载图片(提示下载)</button>
+        <button class="button" @click="axiosDownImage">axios & data:URL下载Image</button>
+        <button class="button" @click="axiosDownPdf">axios & blob:URL下载PDF</button>
+        <button class="button" @click="downloadTxt">下载Txt</button>
+        <button class="button" @click="downloadPDF">下载pdf</button>
       </div>
     </div>
   </div>
@@ -108,7 +113,7 @@
         }
 
         // 将 base64 转换成 blob
-        const base64ToBlob = (dataUrl) => {
+        const dataUrlToBlob = (dataUrl) => {
           console.log(dataUrl)
           const arr = dataUrl.split(',')
           debugger
@@ -143,8 +148,8 @@
           const downloadDataUrlDom = document.createElement('a')
           // downloadDataUrlDom.setAttribute('href', imageDataUrl)
           // // 第二种方式 在第一种方式基础上
-          // const imageBlobData = base64ToBlob(imageDataUrl)
-          // console.log(imageBlobData);
+          const imageBlobData = dataUrlToBlob(imageDataUrl)
+          console.log(imageBlobData);
           debugger
           // const base64Data = await blobToBase64(imageBlobData)
           // 生成 blob:URLs 
@@ -156,7 +161,7 @@
           downloadDataUrlDom.setAttribute('download', 'cutegirl')
           downloadDataUrlDom.click()
           debugger
-          URL.revokeObjectURL(imageBlobData)
+          URL.revokeObjectURL(downloadDataUrlDom.href)
         }
       },
       downloadTxt() {
@@ -174,7 +179,7 @@
       downloadPDF() {
         // 将 base64 转换成 blob
         // 后端能直接处理成 blob 就能省略这些了
-        const base64ToBlob = (dataUrl) => {
+        const dataUrlToBlob = (dataUrl) => {
           console.log(dataUrl)
           const arr = dataUrl.split(',')
           debugger
@@ -195,7 +200,7 @@
           console.log(res);
           const dataUrl = `data:application/pdf;base64,${res.data}`
           console.log(dataUrl);
-          const blob = base64ToBlob(dataUrl)
+          const blob = dataUrlToBlob(dataUrl)
           // const blob = new Blob([res.data])
           alink.setAttribute('href', URL.createObjectURL(blob))
           alink.setAttribute('download', 'JavaScript')

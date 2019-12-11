@@ -9,7 +9,8 @@
   <style type="text/css">
     #location-img,
     #location-zip,
-    #iframe {
+    #iframe1-button,
+    #iframe2-button {
       padding: 10px;
       margin: 10px;
       border: 1px solid #666666;
@@ -30,8 +31,13 @@
         <button id="location-zip">location.href下载zip</button>
       </div>
       <div>
-        <button id="iframe">
-          iframe下载
+        <button id="iframe2-button">
+          iframe下载Image
+        </button>
+      </div>
+      <div>
+        <button id="iframe1-button">
+          iframe下载Docx
         </button>
       </div>
     </div>
@@ -39,17 +45,22 @@
 </body>
 <script>
   function handleLocationImg() {
+    debugger
+    // 表示当前页打开指定的 URL
     location.href = '../downloads/cutegirl.jpg'
+
   }
   document.getElementById('location-img').addEventListener('click', handleLocationImg)
 
   function handleLocationZip() {
+    debugger
     location.href = '../downloads/package.zip'
   }
   document.getElementById('location-zip').addEventListener('click', handleLocationZip)
 
-  // 无闪现下载excel
+  // 无闪现下载=
   function download(url) {
+    debugger
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     function iframeLoad() {
@@ -78,10 +89,19 @@
     document.body.appendChild(iframe);
 
     setTimeout(function loadUrl() {
+      // 在自定义frame窗口打开url地址
       iframe.contentWindow.location.href = url;
     }, 50);
   }
 
+  function handleDownImage() {
+    const iframe = document.createElement('iframe')
+    // iframe.style.display = 'none'
+    iframe.src = 'http://img.mp.itc.cn/upload/20170605/9dea8e0dd718472aa913dae6a1e2b94b_th.jpg'
+    document.body.appendChild(iframe)
+  }
+
+  document.getElementById('iframe2-button').addEventListener('click', handleDownImage)
   function handleDownIframe() {
     // 优点是能实现无闪现下载
     // 缺点是无法监听下载进度，无法剔除 iframe 标签
@@ -93,6 +113,6 @@
     // const url = '../downloads/helpFile.docx'
     // download(url)
   }
-  document.getElementById('iframe').addEventListener('click', handleDownIframe)
+  document.getElementById('iframe1-button').addEventListener('click', handleDownIframe)
 
 </script>

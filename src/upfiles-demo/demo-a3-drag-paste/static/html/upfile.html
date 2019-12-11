@@ -99,6 +99,7 @@
             dropBox.classList.remove('hilight')
             e.preventDefault(); //取消浏览器默认拖拽效果，否则浏览器会默认打开文件
             const fileList = e.dataTransfer.files; //获取拖拽中的文件对象
+            debugger
             const len = fileList.length;//用来获取文件的长度（其实是获得文件数量）
             console.log('fielist is array?', Array.isArray(fileList));
 
@@ -110,12 +111,18 @@
             // 因为是 FileList 对象 不能用 forEach
             // 解决重复添加文件的处理
             let files = window.willUploadFileList || []
-            for (var i = 0; i < fileList.length; i++) {
-                const fileName = fileList[i].name
+            Array.from(fileList).forEach(item => {
+                const fileName = item.name
                 if (files && !files.find(file => file.name === fileName)) {
-                    files.push(fileList[i])
+                    files.push(item)
                 }
-            }
+            })
+            // for (var i = 0; i < fileList.length; i++) {
+            //     const fileName = fileList[i].name
+            //     if (files && !files.find(file => file.name === fileName)) {
+            //         files.push(fileList[i])
+            //     }
+            // }
             dropBox.innerHTML = ""
             files.forEach(file => {
                 const fileName = file.name
@@ -163,22 +170,21 @@
 
     function submitDragUpload() {
 
-        var fileList = window.willUploadFileList || [];
+        const fileList = window.willUploadFileList || [];
         console.log('fielist is array?', Array.isArray(fileList))
         if (!fileList.length) {
             alert('请选择文件');
             return;
         }
 
-        var fd = new FormData();   //构造FormData对象
+        const fd = new FormData();   //构造FormData对象
 
         // for (var i = 0; i < fileList.length; i++) {
         //     fd.append('f1', fileList[i]);//支持多文件上传
         // }
         fileList.forEach((file, index) => {
-            fd.append(`f${index + 1}`, file);//支持多文件上传
+            fd.append('f1', file);//支持多文件上传
         })
-
         // const config = {
         //     onUploadProgress: progressEvent => {
         //         const complete = (progressEvent.loaded / progressEvent.total * 100 | 0)

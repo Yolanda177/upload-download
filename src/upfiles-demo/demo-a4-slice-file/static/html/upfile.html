@@ -75,6 +75,7 @@
         }
         const chunks = Math.ceil(file.size / chunkSize) // 计算这个文件可以切成几块
         console.log(`总共${chunks}个分片`)
+        debugger
         const fileChunks = []
         const token = (+ new Date()) // 文件唯一标识，用于最后合并文件
 
@@ -103,6 +104,7 @@
 
         let i = 0
         const upLoadInOrder = async () => {
+            debugger
             var fd = new FormData()   //构造FormData对象
             fd.append('token', token) // 与后端协调分片需要传送过去的参数，一般是文件的标识id，分片长度，分片的序号、所占长度等等
             fd.append('f1', fileChunks[i])
